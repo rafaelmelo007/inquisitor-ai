@@ -22,28 +22,28 @@ public class GetLeaderboardHandlerTests
         var expectedEntries = new List<LeaderboardEntryDto>
         {
             new(
-                Rank: 1,
+                Rank: 1L,
                 UserId: _faker.Random.Long(1, 10000),
                 DisplayName: _faker.Person.FullName,
                 AvatarUrl: _faker.Internet.Avatar(),
                 BestScore: 9.5m,
-                SessionCount: 5,
+                SessionCount: 5L,
                 AverageScore: 8.8m),
             new(
-                Rank: 2,
+                Rank: 2L,
                 UserId: _faker.Random.Long(1, 10000),
                 DisplayName: _faker.Person.FullName,
                 AvatarUrl: _faker.Internet.Avatar(),
                 BestScore: 8.2m,
-                SessionCount: 3,
+                SessionCount: 3L,
                 AverageScore: 7.5m),
             new(
-                Rank: 3,
+                Rank: 3L,
                 UserId: _faker.Random.Long(1, 10000),
                 DisplayName: _faker.Person.FullName,
                 AvatarUrl: null,
                 BestScore: 7.0m,
-                SessionCount: 2,
+                SessionCount: 2L,
                 AverageScore: 6.9m)
         };
 

@@ -3,7 +3,7 @@ namespace InquisitorAI.Features.Scores.Dtos;
 public record UserScoreSummaryDto(
     long UserId,
     string DisplayName,
-    int TotalSessions,
+    long TotalSessions,
     decimal AverageScore,
     decimal BestScore,
-    DateTimeOffset? LastSessionAt);
+    DateTime? LastSessionAt);

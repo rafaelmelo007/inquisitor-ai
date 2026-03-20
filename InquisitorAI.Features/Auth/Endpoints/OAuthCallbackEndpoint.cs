@@ -2,6 +2,7 @@ using System.Security.Claims;
 using InquisitorAI.Features.Auth.Commands;
 using InquisitorAI.Features.Auth.Dtos;
 using InquisitorAI.Features.Shared;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -56,7 +57,11 @@ public static class OAuthCallbackEndpoint
         string provider,
         CancellationToken ct)
     {
-        var principal = httpContext.User;
+        var authResult = await httpContext.AuthenticateAsync("External");
+        if (!authResult.Succeeded)
+            return Results.BadRequest(new { errors = new[] { "External authentication failed." } });
+
+        var principal = authResult.Principal!;
 
         var externalId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
         var email = principal.FindFirstValue(ClaimTypes.Email);
@@ -71,17 +76,19 @@ public static class OAuthCallbackEndpoint
         var command = new IssueTokensCommand(provider, externalId, email, displayName ?? email, avatarUrl);
         var result = await handler.HandleAsync(command, ct);
 
+        await httpContext.SignOutAsync("External");
+
         if (notifications.HasErrors)
         {
             return Results.BadRequest(new { errors = notifications.Errors });
         }
 
         // Check if this is a native flow (loopback redirect)
-        var state = httpContext.Request.Query["state"].ToString();
-        if (!string.IsNullOrEmpty(state) && state.StartsWith("http://localhost", StringComparison.OrdinalIgnoreCase))
+        var loopbackUri = authResult.Properties?.Items["loopback_uri"];
+        if (!string.IsNullOrEmpty(loopbackUri))
         {
-            var separator = state.Contains('?') ? "&" : "?";
-            var redirectUrl = $"{state}{separator}access_token={result!.AccessToken}&refresh_token={result.RefreshToken}";
+            var separator = loopbackUri.Contains('?') ? "&" : "?";
+            var redirectUrl = $"{loopbackUri}{separator}access_token={result!.AccessToken}&refresh_token={result.RefreshToken}";
             return Results.Redirect(redirectUrl);
         }
 

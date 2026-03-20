@@ -13,7 +13,7 @@ public static class QuestionnaireMappingExtensions
             entity.User?.DisplayName ?? string.Empty,
             entity.IsPublic,
             entity.Questions?.Count ?? 0,
-            entity.CreatedAt);
+            entity.CreatedAt.UtcDateTime);
 
     public static QuestionDto ToDto(this Question entity) =>
         new(

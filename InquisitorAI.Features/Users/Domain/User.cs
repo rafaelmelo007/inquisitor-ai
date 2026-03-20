@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using InquisitorAI.Features.Auth.Domain;
 using InquisitorAI.Features.InterviewSessions.Domain;
 using InquisitorAI.Features.Questionnaires.Domain;
@@ -16,8 +15,7 @@ public class User
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 
-    [Timestamp]
-    public byte[] RowVersion { get; set; } = [];
+    public uint RowVersion { get; set; }
 
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
     public ICollection<Questionnaire> Questionnaires { get; set; } = [];

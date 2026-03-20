@@ -18,14 +18,14 @@ public class GetQuestionnairesHandlerTests
     {
         // Arrange
         var mockDb = new Mock<IDbConnection>();
-        var fixedNow = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        var fixedNow = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         var expectedDtos = new List<QuestionnaireDto>
         {
             new(_faker.Random.Long(1, 10000), _faker.Lorem.Sentence(), _faker.Random.Long(1, 100),
-                _faker.Person.FullName, true, _faker.Random.Int(1, 20), fixedNow.AddDays(-1)),
+                _faker.Person.FullName, true, _faker.Random.Long(1, 20), fixedNow.AddDays(-1)),
             new(_faker.Random.Long(1, 10000), _faker.Lorem.Sentence(), _faker.Random.Long(1, 100),
-                _faker.Person.FullName, false, _faker.Random.Int(1, 20), fixedNow.AddDays(-2))
+                _faker.Person.FullName, false, _faker.Random.Long(1, 20), fixedNow.AddDays(-2))
         };
 
         mockDb.SetupDapper(c => c.QueryAsync<QuestionnaireDto>(

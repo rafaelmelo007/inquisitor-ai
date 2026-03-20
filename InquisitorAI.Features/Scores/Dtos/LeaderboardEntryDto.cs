@@ -1,10 +1,10 @@
 namespace InquisitorAI.Features.Scores.Dtos;
 
 public record LeaderboardEntryDto(
-    int Rank,
+    long Rank,
     long UserId,
     string DisplayName,
     string? AvatarUrl,
     decimal BestScore,
-    int SessionCount,
+    long SessionCount,
     decimal AverageScore);

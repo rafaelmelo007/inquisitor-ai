@@ -6,4 +6,4 @@ public record UserDto(
     string DisplayName,
     string? AvatarUrl,
     string Provider,
-    DateTimeOffset CreatedAt);
+    DateTime CreatedAt);

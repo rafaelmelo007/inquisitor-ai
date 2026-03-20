@@ -20,7 +20,7 @@ public class SessionAnswerConfiguration : IEntityTypeConfiguration<SessionAnswer
         builder.Property(a => a.ImprovementSuggestions).HasColumnName("improvement_suggestions");
         builder.Property(a => a.CreatedAt).HasColumnName("created_at").IsRequired();
         builder.Property(a => a.UpdatedAt).HasColumnName("updated_at").IsRequired();
-        builder.Property(a => a.RowVersion).HasColumnName("row_version").IsRowVersion();
+        builder.Property(a => a.RowVersion).HasColumnName("xmin").HasColumnType("xid").IsRowVersion();
 
         builder.HasOne(a => a.Session)
             .WithMany(s => s.SessionAnswers)

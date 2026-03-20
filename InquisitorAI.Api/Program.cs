@@ -41,6 +41,7 @@ try
 
     var authBuilder = builder.Services
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddCookie("External")
         .AddJwtBearer(options =>
         {
             var secret = config["Jwt:Secret"]
@@ -62,6 +63,7 @@ try
     {
         authBuilder.AddGoogle(options =>
         {
+            options.SignInScheme = "External";
             options.ClientId = config["Authentication:Google:ClientId"]!;
             options.ClientSecret = config["Authentication:Google:ClientSecret"]!;
         });
@@ -71,6 +73,7 @@ try
     {
         authBuilder.AddGitHub(options =>
         {
+            options.SignInScheme = "External";
             options.ClientId = config["Authentication:GitHub:ClientId"]!;
             options.ClientSecret = config["Authentication:GitHub:ClientSecret"]!;
         });
@@ -80,6 +83,7 @@ try
     {
         authBuilder.AddLinkedIn(options =>
         {
+            options.SignInScheme = "External";
             options.ClientId = config["Authentication:LinkedIn:ClientId"]!;
             options.ClientSecret = config["Authentication:LinkedIn:ClientSecret"]!;
         });

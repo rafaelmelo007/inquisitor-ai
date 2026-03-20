@@ -12,5 +12,5 @@ public static class UserMappingExtensions
             entity.DisplayName,
             entity.AvatarUrl,
             entity.Provider.ToString(),
-            entity.CreatedAt);
+            entity.CreatedAt.UtcDateTime);
 }

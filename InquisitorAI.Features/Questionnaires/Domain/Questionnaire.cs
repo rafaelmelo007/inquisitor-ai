@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using InquisitorAI.Features.Users.Domain;
 
 namespace InquisitorAI.Features.Questionnaires.Domain;
@@ -12,8 +11,7 @@ public class Questionnaire
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 
-    [Timestamp]
-    public byte[] RowVersion { get; set; } = [];
+    public uint RowVersion { get; set; }
 
     public User User { get; set; } = null!;
     public ICollection<Question> Questions { get; set; } = [];

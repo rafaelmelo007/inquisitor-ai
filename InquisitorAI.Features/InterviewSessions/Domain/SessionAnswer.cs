@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace InquisitorAI.Features.InterviewSessions.Domain;
 
 public class SessionAnswer
@@ -16,8 +14,7 @@ public class SessionAnswer
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 
-    [Timestamp]
-    public byte[] RowVersion { get; set; } = [];
+    public uint RowVersion { get; set; }
 
     public InterviewSession Session { get; set; } = null!;
     public Questionnaires.Domain.Question Question { get; set; } = null!;

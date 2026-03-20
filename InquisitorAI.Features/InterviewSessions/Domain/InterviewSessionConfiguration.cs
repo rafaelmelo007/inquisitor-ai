@@ -20,7 +20,7 @@ public class InterviewSessionConfiguration : IEntityTypeConfiguration<InterviewS
         builder.Property(s => s.ReportContent).HasColumnName("report_content").HasColumnType("text");
         builder.Property(s => s.CreatedAt).HasColumnName("created_at").IsRequired();
         builder.Property(s => s.UpdatedAt).HasColumnName("updated_at").IsRequired();
-        builder.Property(s => s.RowVersion).HasColumnName("row_version").IsRowVersion();
+        builder.Property(s => s.RowVersion).HasColumnName("xmin").HasColumnType("xid").IsRowVersion();
 
         builder.HasOne(s => s.User)
             .WithMany(u => u.InterviewSessions)

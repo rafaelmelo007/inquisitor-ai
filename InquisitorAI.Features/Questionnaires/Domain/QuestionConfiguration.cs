@@ -18,7 +18,7 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
         builder.Property(q => q.IdealAnswer).HasColumnName("ideal_answer").IsRequired();
         builder.Property(q => q.CreatedAt).HasColumnName("created_at").IsRequired();
         builder.Property(q => q.UpdatedAt).HasColumnName("updated_at").IsRequired();
-        builder.Property(q => q.RowVersion).HasColumnName("row_version").IsRowVersion();
+        builder.Property(q => q.RowVersion).HasColumnName("xmin").HasColumnType("xid").IsRowVersion();
 
         builder.HasOne(q => q.Questionnaire)
             .WithMany(qn => qn.Questions)

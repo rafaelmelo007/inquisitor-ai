@@ -18,7 +18,7 @@ public class GetInterviewSessionsHandlerTests
     {
         // Arrange
         var mockDb = new Mock<IDbConnection>();
-        var fixedNow = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        var fixedNow = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         var userId = _faker.Random.Long(1, 10000);
 
         var expectedDtos = new List<InterviewSessionDto>

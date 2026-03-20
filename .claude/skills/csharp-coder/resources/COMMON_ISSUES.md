@@ -253,3 +253,144 @@ builder.Configuration.AddEnvironmentVariables();
 ```
 
 `DotNetEnv.Env.Load()` sets values as process environment variables. `CreateBuilder()` reads them. The order matters — load first, build second.
+
+---
+
+## 11. PostgreSQL `row_version` NOT NULL constraint violation on INSERT
+
+**Symptom:**
+```
+Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes.
+Inner Exception: PostgresException: 23502: null value in column "row_version" of relation "inq_users" violates not-null constraint
+```
+
+**Root cause:** `[Timestamp] byte[]` with `.IsRowVersion()` maps to a `bytea rowVersion: true` column in Postgres. Unlike SQL Server's `rowversion` type, PostgreSQL does not auto-generate values for `bytea` columns on INSERT — it inserts `null`, hitting the NOT NULL constraint.
+
+**Fix:** Switch to PostgreSQL's built-in `xmin` system column. It is a `uint` (`xid` type) that Postgres increments automatically on every write — no application-side management, no extra column needed.
+
+In every entity, replace:
+```csharp
+[Timestamp]
+public byte[] RowVersion { get; set; } = [];
+```
+With:
+```csharp
+public uint RowVersion { get; set; }
+```
+
+In every configuration, replace:
+```csharp
+builder.Property(e => e.RowVersion).HasColumnName("row_version").IsRowVersion();
+```
+With:
+```csharp
+builder.Property(e => e.RowVersion).HasColumnName("xmin").HasColumnType("xid").IsRowVersion();
+```
+
+Then generate a migration that **drops** the `row_version` columns (the `xmin` system column already exists on every Postgres table — do not try to rename or create it):
+```csharp
+migrationBuilder.DropColumn(name: "row_version", table: "inq_users");
+// repeat for each table
+```
+
+> **Note:** When `dotnet ef migrations add` scaffolds this change, it generates a `RenameColumn` to `xmin` followed by an `AlterColumn`. **Discard that output** and replace with `DropColumn` statements only.
+
+---
+
+## 12. ASP.NET Core OAuth: missing initiation endpoint causes 404
+
+**Symptom:**
+```
+HTTP ERROR 404 — https://localhost:{port}/auth/google?redirect_uri=...
+```
+
+**Root cause:** ASP.NET Core's OAuth middleware only registers the **callback** path (e.g., `/signin-google`). There is no built-in `/auth/{provider}` initiation route — it must be created manually. Without it, the browser hits a 404 when the app tries to start the OAuth flow.
+
+Additionally, without an external cookie scheme (`AddCookie("External")`) and `SignInScheme = "External"` on each provider, the OAuth middleware has nowhere to store the authentication ticket between the provider's callback and the application's callback endpoint, causing the callback to fail silently.
+
+**Fix:**
+
+1. Register the external cookie scheme and set `SignInScheme` on every OAuth provider in `Program.cs`:
+```csharp
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddCookie("External")                       // <-- add this
+    .AddJwtBearer(options => { ... })
+    .AddGoogle(options =>
+    {
+        options.SignInScheme = "External";        // <-- add this
+        options.ClientId = ...;
+        options.ClientSecret = ...;
+    });
+```
+
+2. Create an initiation endpoint that calls `ChallengeAsync`, stores the loopback URI in `AuthenticationProperties`, and redirects to the provider:
+```csharp
+app.MapGet("/auth/{provider}", async (string provider, string? redirect_uri, HttpContext ctx) =>
+{
+    var scheme = provider.ToLower() switch
+    {
+        "google"   => "Google",
+        "github"   => "GitHub",
+        "linkedin" => "LinkedIn",
+        _          => null
+    };
+    if (scheme is null) { ctx.Response.StatusCode = 404; return; }
+
+    var props = new AuthenticationProperties { RedirectUri = $"/auth/{provider}/callback" };
+    if (!string.IsNullOrEmpty(redirect_uri))
+        props.Items["loopback_uri"] = redirect_uri;
+
+    await ctx.ChallengeAsync(scheme, props);
+}).AllowAnonymous();
+```
+
+3. In the callback endpoint, use `AuthenticateAsync("External")` instead of `httpContext.User`, and read the loopback URI from `authResult.Properties.Items["loopback_uri"]` instead of the raw `state` query parameter (which the middleware encodes and owns):
+```csharp
+var authResult = await httpContext.AuthenticateAsync("External");
+if (!authResult.Succeeded) return Results.Unauthorized();
+
+var principal = authResult.Principal!;
+// ... issue tokens ...
+
+await httpContext.SignOutAsync("External");
+
+var loopbackUri = authResult.Properties?.Items["loopback_uri"];
+if (!string.IsNullOrEmpty(loopbackUri))
+    return Results.Redirect($"{loopbackUri}?access_token={accessToken}&refresh_token={refreshToken}");
+```
+
+---
+
+## 13. Dapper constructor materialization failure with `DateTimeOffset` and `COUNT()`
+
+**Symptom:**
+```
+System.InvalidOperationException: A parameterless default constructor or one matching signature
+(..., System.DateTime createdat) is required for materialization
+```
+
+**Root cause:** Two type mismatches between the SQL result and the C# record constructor:
+
+1. **`DateTimeOffset` vs `DateTime`:** Npgsql maps `timestamp with time zone` to `DateTime` (UTC) for Dapper queries. A record constructor with `DateTimeOffset` does not match, so Dapper cannot find a suitable constructor.
+2. **`int` vs `long` for `COUNT()`:** PostgreSQL's `COUNT()` returns `bigint` (`long`). A constructor parameter typed as `int` does not match.
+
+Dapper uses constructor injection for records and tries to match SQL column names to parameter names. Any type mismatch prevents materialization entirely.
+
+**Fix:** Use `DateTime` and `long` in the DTO:
+```csharp
+// Wrong
+public record QuestionnaireDto(..., int QuestionCount, DateTimeOffset CreatedAt);
+
+// Correct
+public record QuestionnaireDto(..., long QuestionCount, DateTime CreatedAt);
+```
+
+Also update any mapping extensions that pass `DateTimeOffset` domain values into the DTO:
+```csharp
+// Wrong
+entity.CreatedAt
+
+// Correct
+entity.CreatedAt.UtcDateTime
+```

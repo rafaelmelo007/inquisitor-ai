@@ -17,7 +17,7 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         builder.Property(rt => rt.RevokedAt).HasColumnName("revoked_at");
         builder.Property(rt => rt.CreatedAt).HasColumnName("created_at").IsRequired();
         builder.Property(rt => rt.UpdatedAt).HasColumnName("updated_at").IsRequired();
-        builder.Property(rt => rt.RowVersion).HasColumnName("row_version").IsRowVersion();
+        builder.Property(rt => rt.RowVersion).HasColumnName("xmin").HasColumnType("xid").IsRowVersion();
 
         builder.HasIndex(rt => rt.Token).HasDatabaseName("ix_inq_refresh_tokens_token_hash");
 

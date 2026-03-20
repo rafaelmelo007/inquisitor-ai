@@ -6,5 +6,5 @@ public record QuestionnaireDto(
     long CreatedByUserId,
     string CreatedByDisplayName,
     bool IsPublic,
-    int QuestionCount,
-    DateTimeOffset CreatedAt);
+    long QuestionCount,
+    DateTime CreatedAt);

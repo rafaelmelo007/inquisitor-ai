@@ -22,6 +22,7 @@ public static class Setup
 
     public static WebApplication MapAuthEndpoints(this WebApplication app)
     {
+        app.MapOAuthInitiateEndpoints();
         app.MapOAuthCallbackEndpoints();
         app.MapRefreshTokenEndpoint();
         app.MapLogoutEndpoint();

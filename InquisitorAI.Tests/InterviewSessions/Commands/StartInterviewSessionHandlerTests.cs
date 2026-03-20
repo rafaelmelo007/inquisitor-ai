@@ -67,7 +67,7 @@ public class StartInterviewSessionHandlerTests
         // Assert
         notifications.HasErrors.Should().BeFalse();
         result.Should().NotBeNull();
-        result!.StartedAt.Should().Be(_fixedNow);
+        result!.StartedAt.Should().Be(_fixedNow.UtcDateTime);
         result.QuestionnaireId.Should().Be(questionnaire.Id);
         result.UserId.Should().Be(user.Id);
 

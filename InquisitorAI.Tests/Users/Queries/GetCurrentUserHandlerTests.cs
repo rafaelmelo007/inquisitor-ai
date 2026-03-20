@@ -25,7 +25,7 @@ public class GetCurrentUserHandlerTests
             _faker.Person.FullName,
             _faker.Internet.Avatar(),
             "Google",
-            new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
+            new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
 
         mockDb.SetupDapper(c => c.QuerySingleOrDefaultAsync<UserDto>(
                 It.IsAny<string>(),

@@ -4,6 +4,7 @@ using InquisitorAI.Features.Questionnaires.Dtos;
 using InquisitorAI.Features.Shared;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace InquisitorAI.Features.Questionnaires.Endpoints;
@@ -19,7 +20,7 @@ public static class ImportQuestionnaireEndpoint
 
     public static async Task<IResult> Handle(
         IFormFile file,
-        bool isPublic,
+        [FromForm] bool isPublic,
         ClaimsPrincipal user,
         ICommandHandler<ImportQuestionnaireCommand, QuestionnaireDto?> handler,
         NotificationHandler notifications,

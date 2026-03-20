@@ -19,7 +19,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.AvatarUrl).HasColumnName("avatar_url").HasMaxLength(1024);
         builder.Property(u => u.CreatedAt).HasColumnName("created_at").IsRequired();
         builder.Property(u => u.UpdatedAt).HasColumnName("updated_at").IsRequired();
-        builder.Property(u => u.RowVersion).HasColumnName("row_version").IsRowVersion();
+        builder.Property(u => u.RowVersion).HasColumnName("xmin").HasColumnType("xid").IsRowVersion();
 
         builder.HasIndex(u => new { u.Provider, u.ExternalId }).IsUnique()
             .HasDatabaseName("ix_inq_users_provider_external_id");

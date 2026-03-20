@@ -15,7 +15,7 @@ public class QuestionnaireConfiguration : IEntityTypeConfiguration<Questionnaire
         builder.Property(q => q.IsPublic).HasColumnName("is_public").IsRequired();
         builder.Property(q => q.CreatedAt).HasColumnName("created_at").IsRequired();
         builder.Property(q => q.UpdatedAt).HasColumnName("updated_at").IsRequired();
-        builder.Property(q => q.RowVersion).HasColumnName("row_version").IsRowVersion();
+        builder.Property(q => q.RowVersion).HasColumnName("xmin").HasColumnType("xid").IsRowVersion();
 
         builder.HasOne(q => q.User)
             .WithMany(u => u.Questionnaires)
