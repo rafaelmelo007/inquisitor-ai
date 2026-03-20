@@ -1,0 +1,48 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InquisitorAI.Api", "InquisitorAI.Api\InquisitorAI.Api.csproj", "{448C068D-D2EF-E6D3-3458-1DA0EA9D2B95}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InquisitorAI.Features", "InquisitorAI.Features\InquisitorAI.Features.csproj", "{DE52624F-A682-21E6-DCC0-9725D93DFB38}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InquisitorAI.Infrastructure", "InquisitorAI.Infrastructure\InquisitorAI.Infrastructure.csproj", "{81454787-F8A1-E158-B8FF-E524A8FDC1BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InquisitorAI.Tests", "InquisitorAI.Tests\InquisitorAI.Tests.csproj", "{A37D9260-CACE-9BE3-98CB-F7B2FA5D9690}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InquisitorAI.UI", "InquisitorAI.UI\InquisitorAI.UI.csproj", "{0A2D1C57-1D6F-3E45-9B19-D94171E501D8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{448C068D-D2EF-E6D3-3458-1DA0EA9D2B95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{448C068D-D2EF-E6D3-3458-1DA0EA9D2B95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{448C068D-D2EF-E6D3-3458-1DA0EA9D2B95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{448C068D-D2EF-E6D3-3458-1DA0EA9D2B95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE52624F-A682-21E6-DCC0-9725D93DFB38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE52624F-A682-21E6-DCC0-9725D93DFB38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE52624F-A682-21E6-DCC0-9725D93DFB38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE52624F-A682-21E6-DCC0-9725D93DFB38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81454787-F8A1-E158-B8FF-E524A8FDC1BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81454787-F8A1-E158-B8FF-E524A8FDC1BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81454787-F8A1-E158-B8FF-E524A8FDC1BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81454787-F8A1-E158-B8FF-E524A8FDC1BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A37D9260-CACE-9BE3-98CB-F7B2FA5D9690}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A37D9260-CACE-9BE3-98CB-F7B2FA5D9690}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A37D9260-CACE-9BE3-98CB-F7B2FA5D9690}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A37D9260-CACE-9BE3-98CB-F7B2FA5D9690}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A2D1C57-1D6F-3E45-9B19-D94171E501D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A2D1C57-1D6F-3E45-9B19-D94171E501D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A2D1C57-1D6F-3E45-9B19-D94171E501D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A2D1C57-1D6F-3E45-9B19-D94171E501D8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7B07305E-9614-4371-B032-3FBCFEFB40A4}
+	EndGlobalSection
+EndGlobal

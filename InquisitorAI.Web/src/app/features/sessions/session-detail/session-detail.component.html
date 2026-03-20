@@ -1,0 +1,94 @@
+<div class="mx-auto max-w-4xl px-4 py-8">
+  @if (store.loading()) {
+    <app-loading-spinner message="Loading session..." />
+  } @else if (store.error()) {
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      {{ store.error() }}
+    </div>
+  } @else if (store.selectedSession(); as session) {
+    <!-- Session Header -->
+    <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">{{ session.questionnaireName }}</h1>
+          <p class="mt-1 text-sm text-gray-500">
+            {{ session.startedAt | date:'medium' }} &middot; {{ formatDuration(session.durationSeconds) }}
+          </p>
+        </div>
+        <div class="flex items-center gap-4">
+          @if (session.finalScore !== null) {
+            <span class="text-3xl font-bold text-indigo-600">{{ session.finalScore }}</span>
+          }
+          @if (session.classification) {
+            <app-score-badge [classification]="session.classification" />
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Report Content -->
+    @if (session.reportContent) {
+      <div class="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h2 class="text-lg font-semibold text-gray-900">Report</h2>
+        <div class="mt-4">
+          <app-markdown-viewer [content]="session.reportContent" />
+        </div>
+      </div>
+    }
+
+    <!-- Per-Question Accordion -->
+    <div class="mt-6 space-y-3">
+      <h2 class="text-lg font-semibold text-gray-900">Answers</h2>
+      @for (answer of session.answers; track answer.id; let i = $index) {
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+          <button (click)="toggleAnswer(i)"
+                  class="flex w-full items-center justify-between px-5 py-4 text-left">
+            <span class="text-sm font-medium text-gray-900">{{ i + 1 }}. {{ answer.questionText }}</span>
+            <div class="flex items-center gap-2">
+              @if (answer.score !== null) {
+                <span class="text-sm font-semibold text-indigo-600">{{ answer.score }}/10</span>
+              }
+              <span class="text-gray-400">
+                @if (expandedIndex() === i) { &#9650; } @else { &#9660; }
+              </span>
+            </div>
+          </button>
+          @if (expandedIndex() === i) {
+            <div class="space-y-4 border-t border-gray-200 px-5 py-4">
+              @if (answer.transcript) {
+                <div>
+                  <h4 class="text-sm font-semibold text-gray-700">Your Answer</h4>
+                  <p class="mt-1 whitespace-pre-wrap text-sm text-gray-600">{{ answer.transcript }}</p>
+                </div>
+              }
+              @if (answer.aiFeedback) {
+                <div>
+                  <h4 class="text-sm font-semibold text-gray-700">AI Feedback</h4>
+                  <p class="mt-1 whitespace-pre-wrap text-sm text-gray-600">{{ answer.aiFeedback }}</p>
+                </div>
+              }
+              @if (answer.strengths) {
+                <div>
+                  <h4 class="text-sm font-semibold text-green-700">Strengths</h4>
+                  <p class="mt-1 whitespace-pre-wrap text-sm text-green-600">{{ answer.strengths }}</p>
+                </div>
+              }
+              @if (answer.weaknesses) {
+                <div>
+                  <h4 class="text-sm font-semibold text-red-700">Weaknesses</h4>
+                  <p class="mt-1 whitespace-pre-wrap text-sm text-red-600">{{ answer.weaknesses }}</p>
+                </div>
+              }
+              @if (answer.improvementSuggestions) {
+                <div>
+                  <h4 class="text-sm font-semibold text-blue-700">Improvement Suggestions</h4>
+                  <p class="mt-1 whitespace-pre-wrap text-sm text-blue-600">{{ answer.improvementSuggestions }}</p>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

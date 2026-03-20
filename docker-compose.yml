@@ -1,0 +1,22 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: InquisitorAI.Api/Dockerfile
+    ports:
+      - "8080:8080"
+    env_file: .env
+    volumes:
+      - logs:/logs
+
+  web:
+    build:
+      context: ./InquisitorAI.Web
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    depends_on:
+      - api
+
+volumes:
+  logs:
