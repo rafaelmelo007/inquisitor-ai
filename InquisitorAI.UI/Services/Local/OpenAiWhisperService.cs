@@ -16,7 +16,7 @@ public class OpenAiWhisperService : ISpeechToTextService
             ?? throw new InvalidOperationException("OpenAi:ApiKey is not configured.");
     }
 
-    public async Task<string> TranscribeAsync(string audioFilePath, CancellationToken ct)
+    public async Task<string> TranscribeAsync(string audioFilePath, CancellationToken ct, string? language = null)
     {
         using var content = new MultipartFormDataContent();
 
@@ -25,6 +25,10 @@ public class OpenAiWhisperService : ISpeechToTextService
         fileContent.Headers.ContentType = new MediaTypeHeaderValue("audio/wav");
         content.Add(fileContent, "file", Path.GetFileName(audioFilePath));
         content.Add(new StringContent("whisper-1"), "model");
+
+        var languageCode = GetWhisperLanguageCode(language);
+        if (languageCode != null)
+            content.Add(new StringContent(languageCode), "language");
 
         using var request = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/audio/transcriptions")
         {
@@ -42,6 +46,17 @@ public class OpenAiWhisperService : ISpeechToTextService
         });
 
         return result?.Text ?? string.Empty;
+    }
+
+    private static string? GetWhisperLanguageCode(string? language)
+    {
+        return language switch
+        {
+            "Español" or "Spanish" => "es",
+            "Português" or "Portuguese" => "pt",
+            "English" => "en",
+            _ => null
+        };
     }
 
     private sealed class WhisperResponse

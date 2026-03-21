@@ -11,4 +11,5 @@ public record InterviewSessionDto(
     TimeSpan? Duration,
     decimal? FinalScore,
     string? Classification,
-    string? ReportContent);
+    string? ReportContent,
+    IReadOnlyList<SessionAnswerDto>? Answers = null);

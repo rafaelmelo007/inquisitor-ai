@@ -12,7 +12,7 @@ public interface IApiClient
     Task<QuestionnaireDetailDto> GetQuestionnaireByIdAsync(long id);
     Task<QuestionnaireDto> ImportQuestionnaireAsync(string filePath, bool isPublic);
     Task DeleteQuestionnaireAsync(long id);
-    Task<InterviewSessionDto> StartSessionAsync(long questionnaireId);
+    Task<InterviewSessionDto> StartSessionAsync(long questionnaireId, string? language = null);
     Task<SessionAnswerDto> SubmitAnswerAsync(long sessionId, long questionId, string transcript);
     Task<FinalResultDto> FinishSessionAsync(long sessionId);
     Task<IEnumerable<InterviewSessionDto>> GetSessionsAsync();

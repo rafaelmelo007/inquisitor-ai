@@ -64,7 +64,7 @@ public class FinishInterviewSessionHandler(
 
         // Build a temporary DTO to generate the report
         var sessionDto = session.ToDto(session.Questionnaire.Name);
-        var reportContent = reportGenerator.Generate(sessionDto);
+        var reportContent = reportGenerator.Generate(sessionDto, session.Language);
         session.ReportContent = reportContent;
 
         await context.SaveChangesAsync(ct);

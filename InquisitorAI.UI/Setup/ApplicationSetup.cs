@@ -22,11 +22,13 @@ public static class ApplicationSetup
         {
             var baseUrl = config["ApiBaseUrl"] ?? "http://localhost:8080";
             client.BaseAddress = new Uri(baseUrl.TrimEnd('/') + "/");
+            client.Timeout = TimeSpan.FromMinutes(10);
         });
 
         // Local services
         services.AddSingleton<ISpeechSynthesisService, WindowsTtsService>();
         services.AddSingleton<IAudioRecordingService, NAudioRecordingService>();
+        services.AddSingleton<UserPreferencesService>();
         services.AddHttpClient<ISpeechToTextService, OpenAiWhisperService>();
 
         // Auth
@@ -35,10 +37,6 @@ public static class ApplicationSetup
         // Forms
         services.AddTransient<LoginForm>();
         services.AddTransient<MainForm>();
-        services.AddTransient<InterviewForm>();
-        services.AddTransient<ResultForm>();
-        services.AddTransient<HistoryForm>();
-        services.AddTransient<ProfileForm>();
 
         return services;
     }

@@ -50,7 +50,8 @@ public class SubmitAnswerHandler(
         var evaluationRequest = new EvaluateAnswerRequest(
             question.QuestionText,
             question.IdealAnswer,
-            command.Transcript);
+            command.Transcript,
+            session.Language);
 
         var evaluation = await aiEvaluation.EvaluateAsync(evaluationRequest, ct);
 

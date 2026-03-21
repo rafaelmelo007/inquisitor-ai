@@ -14,6 +14,7 @@ public class InterviewSession
     public decimal? FinalScore { get; set; }
     public Classification? Classification { get; set; }
     public string? ReportContent { get; set; }
+    public string? Language { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 

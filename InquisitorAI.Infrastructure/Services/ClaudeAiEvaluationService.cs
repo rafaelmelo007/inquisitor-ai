@@ -79,6 +79,13 @@ public class ClaudeAiEvaluationService(HttpClient httpClient, IConfiguration con
 
     private static string BuildPrompt(EvaluateAnswerRequest request)
     {
+        var languageInstruction = request.Language switch
+        {
+            "Español" or "Spanish" => "\n\n**IMPORTANT: You MUST write your entire response (Summary, Strengths, Weaknesses, ImprovementSuggestions) in Spanish (Español). The JSON field names must remain in English, but all text values must be in Spanish.**",
+            "Português" or "Portuguese" => "\n\n**IMPORTANT: You MUST write your entire response (Summary, Strengths, Weaknesses, ImprovementSuggestions) in Portuguese (Português). The JSON field names must remain in English, but all text values must be in Portuguese.**",
+            _ => ""
+        };
+
         return $"""
             You are an expert technical mentor evaluating a candidate's answer to an interview question.
             Your goal is not just to grade — it is to **teach**. Help the candidate truly understand the topic.
@@ -99,6 +106,7 @@ public class ClaudeAiEvaluationService(HttpClient httpClient, IConfiguration con
             - "Strengths": an array of strings listing specific strengths (or null if none)
             - "Weaknesses": an array of strings listing specific weaknesses (or null if none)
             - "ImprovementSuggestions": an array of strings with concrete, actionable suggestions for improvement (or null if none)
+            {languageInstruction}
             """;
     }
 

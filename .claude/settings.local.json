@@ -10,7 +10,9 @@
       "Bash(dotnet list:*)",
       "Bash(mkdir -p /c/tamarindo/repos/inquisitor-ai/.claude/skills/csharp-coder/resources)",
       "Bash(mv /c/tamarindo/repos/inquisitor-ai/.claude/skills/csharp-coder/COMMON_ISSUES.md /c/tamarindo/repos/inquisitor-ai/.claude/skills/csharp-coder/resources/)",
-      "Bash(dotnet add:*)"
+      "Bash(dotnet add:*)",
+      "Bash(taskkill //F //PID 21296)",
+      "Bash(taskkill //F //PID 30688)"
     ]
   }
 }

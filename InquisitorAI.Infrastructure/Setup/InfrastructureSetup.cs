@@ -1,7 +1,7 @@
 using System.Data;
 using InquisitorAI.Features.InterviewSessions;
-using InquisitorAI.Features.Questionnaires;
 using InquisitorAI.Features.Auth;
+using InquisitorAI.Features.Questionnaires;
 using InquisitorAI.Features.Shared;
 using InquisitorAI.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -30,11 +30,10 @@ public static class InfrastructureSetup
         services.AddSingleton<IDateTimeService, DateTimeService>();
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IMarkdownParserService, MarkdownParserService>();
-        services.AddScoped<IAiEvaluationService, ClaudeAiEvaluationService>();
         services.AddScoped<IReportGeneratorService, MarkdownReportGeneratorService>();
 
         // HttpClient for Claude AI evaluation service
-        services.AddHttpClient<ClaudeAiEvaluationService>();
+        services.AddHttpClient<IAiEvaluationService, ClaudeAiEvaluationService>();
 
         return services;
     }

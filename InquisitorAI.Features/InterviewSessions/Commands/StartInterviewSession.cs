@@ -6,7 +6,7 @@ using InquisitorAI.Features.Shared;
 
 namespace InquisitorAI.Features.InterviewSessions.Commands;
 
-public record StartInterviewSessionCommand(long UserId, long QuestionnaireId) : ICommand<InterviewSessionDto?>;
+public record StartInterviewSessionCommand(long UserId, long QuestionnaireId, string? Language = null) : ICommand<InterviewSessionDto?>;
 
 public class StartInterviewSessionHandler(
     AppDbContext context,
@@ -32,6 +32,7 @@ public class StartInterviewSessionHandler(
         {
             UserId = command.UserId,
             QuestionnaireId = command.QuestionnaireId,
+            Language = command.Language,
             StartedAt = now,
             CreatedAt = now,
             UpdatedAt = now

@@ -4,5 +4,5 @@ namespace InquisitorAI.Features.InterviewSessions;
 
 public interface IReportGeneratorService
 {
-    string Generate(InterviewSessionDto session);
+    string Generate(InterviewSessionDto session, string? language = null);
 }

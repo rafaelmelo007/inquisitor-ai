@@ -35,16 +35,7 @@ public class ApiClient : IApiClient
 
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            var refreshToken = _tokenStore.GetRefreshToken();
-            if (!string.IsNullOrEmpty(refreshToken))
-            {
-                var tokenResponse = await RefreshTokenAsync(refreshToken);
-                _tokenStore.SaveTokens(tokenResponse.AccessToken, tokenResponse.RefreshToken);
-
-                request = await CloneRequestAsync(request);
-                AttachToken(request);
-                response = await _httpClient.SendAsync(request);
-            }
+            response = await TryRefreshAndRetryAsync(request) ?? response;
         }
 
         response.EnsureSuccessStatusCode();
@@ -59,19 +50,33 @@ public class ApiClient : IApiClient
 
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            var refreshToken = _tokenStore.GetRefreshToken();
-            if (!string.IsNullOrEmpty(refreshToken))
-            {
-                var tokenResponse = await RefreshTokenAsync(refreshToken);
-                _tokenStore.SaveTokens(tokenResponse.AccessToken, tokenResponse.RefreshToken);
-
-                request = await CloneRequestAsync(request);
-                AttachToken(request);
-                response = await _httpClient.SendAsync(request);
-            }
+            response = await TryRefreshAndRetryAsync(request) ?? response;
         }
 
         response.EnsureSuccessStatusCode();
+    }
+
+    private async Task<HttpResponseMessage?> TryRefreshAndRetryAsync(HttpRequestMessage request)
+    {
+        var refreshToken = _tokenStore.GetRefreshToken();
+        if (string.IsNullOrEmpty(refreshToken))
+            return null;
+
+        try
+        {
+            var tokenResponse = await RefreshTokenAsync(refreshToken);
+            _tokenStore.SaveTokens(tokenResponse.AccessToken, tokenResponse.RefreshToken);
+
+            request = await CloneRequestAsync(request);
+            AttachToken(request);
+            return await _httpClient.SendAsync(request);
+        }
+        catch
+        {
+            // Refresh failed (expired, revoked, etc.) — clear tokens so user is prompted to re-login
+            _tokenStore.Clear();
+            return null;
+        }
     }
 
     private static async Task<HttpRequestMessage> CloneRequestAsync(HttpRequestMessage original)
@@ -158,11 +163,11 @@ public class ApiClient : IApiClient
         await SendAsync(request);
     }
 
-    public async Task<InterviewSessionDto> StartSessionAsync(long questionnaireId)
+    public async Task<InterviewSessionDto> StartSessionAsync(long questionnaireId, string? language = null)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "sessions")
         {
-            Content = JsonContent.Create(new { questionnaireId })
+            Content = JsonContent.Create(new { questionnaireId, language })
         };
         return await SendAsync<InterviewSessionDto>(request);
     }

@@ -27,7 +27,7 @@ public static class StartSessionEndpoint
         if (!long.TryParse(userIdClaim, out var userId))
             return Results.Unauthorized();
 
-        var command = new StartInterviewSessionCommand(userId, request.QuestionnaireId);
+        var command = new StartInterviewSessionCommand(userId, request.QuestionnaireId, request.Language);
         var result = await handler.HandleAsync(command, ct);
 
         return notifications.HasErrors
