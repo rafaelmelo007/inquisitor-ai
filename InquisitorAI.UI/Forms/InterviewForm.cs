@@ -17,6 +17,8 @@ public partial class InterviewForm : Form
     private QuestionnaireDetailDto? _questionnaire;
     private int _currentQuestionIndex;
     private string? _currentRecordingPath;
+    private readonly Dictionary<int, SessionAnswerDto> _answers = new();
+    private readonly HashSet<int> _feedbackRevealed = new();
 
     [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
     public long QuestionnaireId { get; set; }
@@ -39,6 +41,8 @@ public partial class InterviewForm : Form
         btnRecord.Click += BtnRecord_Click;
         btnStop.Click += BtnStop_Click;
         btnNext.Click += BtnNext_Click;
+        btnPrevious.Click += BtnPrevious_Click;
+        btnShowFeedback.Click += BtnShowFeedback_Click;
         Load += InterviewForm_Load;
     }
 
@@ -85,16 +89,38 @@ public partial class InterviewForm : Form
         lblDifficulty.Text = $"Difficulty: {question.Difficulty ?? "N/A"}";
         rtbQuestion.Text = question.QuestionText;
 
-        // Reset answer panel
-        lblTranscript.Text = "";
-        lblScore.Text = "";
-        lblFeedback.Text = "";
-
-        // Reset button states
-        btnRecord.Enabled = true;
+        btnPrevious.Enabled = _currentQuestionIndex > 0;
         btnStop.Enabled = false;
-        btnNext.Enabled = false;
-        btnListen.Enabled = true;
+
+        var wasAnswered = _answers.ContainsKey(_currentQuestionIndex);
+        var wasFeedbackRevealed = _feedbackRevealed.Contains(_currentQuestionIndex);
+
+        if (wasAnswered)
+        {
+            DisplayFeedbackSections(_answers[_currentQuestionIndex]);
+            btnRecord.Enabled = false;
+            btnListen.Enabled = true;
+            btnNext.Enabled = true;
+            btnShowFeedback.Enabled = false;
+        }
+        else if (wasFeedbackRevealed)
+        {
+            rtbFeedback.Clear();
+            AppendSection("Feedback was revealed — answer skipped.", "", Color.Gray);
+            AppendSection("Ideal Answer", question.IdealAnswer, Color.FromArgb(0, 100, 180));
+            btnRecord.Enabled = false;
+            btnListen.Enabled = true;
+            btnNext.Enabled = true;
+            btnShowFeedback.Enabled = false;
+        }
+        else
+        {
+            rtbFeedback.Clear();
+            btnRecord.Enabled = true;
+            btnListen.Enabled = true;
+            btnNext.Enabled = false;
+            btnShowFeedback.Enabled = true;
+        }
     }
 
     private async void BtnListen_Click(object? sender, EventArgs e)
@@ -159,11 +185,12 @@ public partial class InterviewForm : Form
             var question = _questionnaire.Questions[_currentQuestionIndex];
             var answer = await _apiClient.SubmitAnswerAsync(_session.Id, question.Id, transcript);
 
-            // Display results
-            lblTranscript.Text = $"Transcript: {answer.Transcript}";
-            lblScore.Text = $"Score: {answer.Score:F1}";
-            lblFeedback.Text = $"Feedback: {answer.Feedback}";
+            // Store and display results
+            _answers[_currentQuestionIndex] = answer;
+            DisplayFeedbackSections(answer);
 
+            btnRecord.Enabled = false;
+            btnShowFeedback.Enabled = false;
             btnNext.Enabled = true;
         }
         catch (Exception ex)
@@ -210,6 +237,85 @@ public partial class InterviewForm : Form
         {
             DisplayCurrentQuestion();
         }
+    }
+
+    private void BtnPrevious_Click(object? sender, EventArgs e)
+    {
+        if (_currentQuestionIndex > 0)
+        {
+            _currentQuestionIndex--;
+            DisplayCurrentQuestion();
+        }
+    }
+
+    private void BtnShowFeedback_Click(object? sender, EventArgs e)
+    {
+        if (_questionnaire == null) return;
+
+        var question = _questionnaire.Questions[_currentQuestionIndex];
+
+        _feedbackRevealed.Add(_currentQuestionIndex);
+
+        rtbFeedback.Clear();
+        AppendSection("Feedback was revealed — answer skipped.", "", Color.Gray);
+        AppendSection("Ideal Answer", question.IdealAnswer, Color.FromArgb(0, 100, 180));
+
+        btnRecord.Enabled = false;
+        btnShowFeedback.Enabled = false;
+        btnNext.Enabled = true;
+    }
+
+    private void DisplayFeedbackSections(SessionAnswerDto answer)
+    {
+        rtbFeedback.Clear();
+
+        AppendSection("Your Answer", answer.Transcript ?? "(no transcript)", Color.FromArgb(80, 80, 80));
+
+        AppendSection("Score", $"{answer.Score:F1} / 10", Color.FromArgb(120, 60, 180));
+
+        if (!string.IsNullOrWhiteSpace(answer.AiFeedback))
+            AppendSection("Overall Feedback", answer.AiFeedback, Color.FromArgb(0, 100, 180));
+
+        if (!string.IsNullOrWhiteSpace(answer.Strengths))
+            AppendSection("Strengths", answer.Strengths, Color.FromArgb(34, 139, 34));
+
+        if (!string.IsNullOrWhiteSpace(answer.Weaknesses))
+            AppendSection("Weaknesses", answer.Weaknesses, Color.FromArgb(200, 50, 50));
+
+        if (!string.IsNullOrWhiteSpace(answer.ImprovementSuggestions))
+            AppendSection("How to Improve", answer.ImprovementSuggestions, Color.FromArgb(180, 120, 0));
+
+        if (!string.IsNullOrWhiteSpace(answer.IdealAnswer))
+            AppendSection("Ideal Answer", answer.IdealAnswer, Color.FromArgb(0, 130, 100));
+
+        rtbFeedback.SelectionStart = 0;
+        rtbFeedback.ScrollToCaret();
+    }
+
+    private void AppendSection(string title, string content, Color titleColor)
+    {
+        if (rtbFeedback.TextLength > 0)
+            rtbFeedback.AppendText("\n\n");
+
+        // Append title
+        var titleStart = rtbFeedback.TextLength;
+        rtbFeedback.AppendText(title);
+        rtbFeedback.Select(titleStart, title.Length);
+        rtbFeedback.SelectionFont = new Font("Segoe UI", 13F, FontStyle.Bold);
+        rtbFeedback.SelectionColor = titleColor;
+
+        // Append content
+        if (!string.IsNullOrEmpty(content))
+        {
+            rtbFeedback.AppendText("\n");
+            var contentStart = rtbFeedback.TextLength;
+            rtbFeedback.AppendText(content);
+            rtbFeedback.Select(contentStart, content.Length);
+            rtbFeedback.SelectionFont = new Font("Segoe UI", 11F);
+            rtbFeedback.SelectionColor = Color.FromArgb(50, 50, 50);
+        }
+
+        rtbFeedback.DeselectAll();
     }
 
     private void CleanupRecording()

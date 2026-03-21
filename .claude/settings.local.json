@@ -9,7 +9,8 @@
       "Bash(dotnet --version)",
       "Bash(dotnet list:*)",
       "Bash(mkdir -p /c/tamarindo/repos/inquisitor-ai/.claude/skills/csharp-coder/resources)",
-      "Bash(mv /c/tamarindo/repos/inquisitor-ai/.claude/skills/csharp-coder/COMMON_ISSUES.md /c/tamarindo/repos/inquisitor-ai/.claude/skills/csharp-coder/resources/)"
+      "Bash(mv /c/tamarindo/repos/inquisitor-ai/.claude/skills/csharp-coder/COMMON_ISSUES.md /c/tamarindo/repos/inquisitor-ai/.claude/skills/csharp-coder/resources/)",
+      "Bash(dotnet add:*)"
     ]
   }
 }

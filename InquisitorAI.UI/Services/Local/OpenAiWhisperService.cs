@@ -12,8 +12,8 @@ public class OpenAiWhisperService : ISpeechToTextService
     public OpenAiWhisperService(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
-        _apiKey = configuration["OpenAiApiKey"]
-            ?? throw new InvalidOperationException("OpenAiApiKey is not configured.");
+        _apiKey = configuration["OpenAi:ApiKey"]
+            ?? throw new InvalidOperationException("OpenAi:ApiKey is not configured.");
     }
 
     public async Task<string> TranscribeAsync(string audioFilePath, CancellationToken ct)

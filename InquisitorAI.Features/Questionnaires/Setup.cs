@@ -18,7 +18,7 @@ public static class Setup
 
         // Query handlers
         services.AddScoped<IQueryHandler<GetQuestionnairesQuery, IEnumerable<QuestionnaireDto>>, GetQuestionnairesHandler>();
-        services.AddScoped<IQueryHandler<GetQuestionnaireByIdQuery, QuestionnaireDto?>, GetQuestionnaireByIdHandler>();
+        services.AddScoped<IQueryHandler<GetQuestionnaireByIdQuery, QuestionnaireDetailDto?>, GetQuestionnaireByIdHandler>();
 
         return services;
     }

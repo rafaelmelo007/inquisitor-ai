@@ -5,12 +5,12 @@ using InquisitorAI.Features.Shared;
 
 namespace InquisitorAI.Features.Questionnaires.Queries;
 
-public record GetQuestionnaireByIdQuery(long Id, long? RequestingUserId) : IQuery<QuestionnaireDto?>;
+public record GetQuestionnaireByIdQuery(long Id, long? RequestingUserId) : IQuery<QuestionnaireDetailDto?>;
 
 public class GetQuestionnaireByIdHandler(IDbConnection db)
-    : IQueryHandler<GetQuestionnaireByIdQuery, QuestionnaireDto?>
+    : IQueryHandler<GetQuestionnaireByIdQuery, QuestionnaireDetailDto?>
 {
-    public async Task<QuestionnaireDto?> HandleAsync(GetQuestionnaireByIdQuery query, CancellationToken ct = default)
+    public async Task<QuestionnaireDetailDto?> HandleAsync(GetQuestionnaireByIdQuery query, CancellationToken ct = default)
     {
         const string questionnaireSql = """
             SELECT
@@ -29,8 +29,37 @@ public class GetQuestionnaireByIdHandler(IDbConnection db)
             GROUP BY q.id, q.name, q.created_by_user_id, u.display_name, q.is_public, q.created_at
             """;
 
-        return await db.QuerySingleOrDefaultAsync<QuestionnaireDto>(
+        var questionnaire = await db.QuerySingleOrDefaultAsync<QuestionnaireDto>(
             questionnaireSql,
             new { query.Id, query.RequestingUserId });
+
+        if (questionnaire is null)
+            return null;
+
+        const string questionsSql = """
+            SELECT
+                id AS Id,
+                questionnaire_id AS QuestionnaireId,
+                order_index AS OrderIndex,
+                category AS Category,
+                difficulty AS Difficulty,
+                question_text AS QuestionText,
+                ideal_answer AS IdealAnswer
+            FROM inq_questions
+            WHERE questionnaire_id = @Id
+            ORDER BY order_index
+            """;
+
+        var questions = (await db.QueryAsync<QuestionDto>(questionsSql, new { query.Id })).ToList();
+
+        return new QuestionnaireDetailDto(
+            questionnaire.Id,
+            questionnaire.Name,
+            questionnaire.CreatedByUserId,
+            questionnaire.CreatedByDisplayName,
+            questionnaire.IsPublic,
+            questionnaire.QuestionCount,
+            questionnaire.CreatedAt,
+            questions);
     }
 }

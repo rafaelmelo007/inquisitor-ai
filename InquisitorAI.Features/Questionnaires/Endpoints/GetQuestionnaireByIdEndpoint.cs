@@ -18,7 +18,7 @@ public static class GetQuestionnaireByIdEndpoint
     public static async Task<IResult> Handle(
         long id,
         ClaimsPrincipal user,
-        IQueryHandler<GetQuestionnaireByIdQuery, QuestionnaireDto?> handler,
+        IQueryHandler<GetQuestionnaireByIdQuery, QuestionnaireDetailDto?> handler,
         CancellationToken ct)
     {
         long? userId = null;
